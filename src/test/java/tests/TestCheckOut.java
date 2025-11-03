@@ -1,18 +1,15 @@
 package tests;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pages.CheckOut;
 import pages.LoginPage;
-import pages.Logout;
 import utils.DriverSetup;
 
 public class TestCheckOut extends DriverSetup {
 
     LoginPage loginPage = new LoginPage();
-    Logout logoutPage = new Logout();
     CheckOut checkOutPage = new CheckOut();
     Dotenv dotenv = Dotenv.load();
     String username = dotenv.get("USER_NAME");
@@ -20,26 +17,12 @@ public class TestCheckOut extends DriverSetup {
 
     @Test
     public void testProductCheckOut() {
-        // Step 1: Login
-        loginPage.loginWithCredentials(username, password);
-
-        // Verify login success
-        loginPage.verifySuccessError(
-                By.className("title"),
-                "Products",
-                "Login failed!",
-                "Login successful for user: " + username
-        );
-        checkOutPage.clickAddToCart();
-        Assert.assertTrue(checkOutPage.isRemoveVisible(), "Remove button should be visible after adding to cart");
-        int count = checkOutPage.getRemoveButtonCount();
-        System.out.println("Remove button count after first click: " + count);
-        Assert.assertEquals(count, 1, "Remove button count should be 1 after first click");
-        checkOutPage.clickAddToCart();
-
-        // Step 6: Verify Remove button count increases or remains same
-        int newCount = checkOutPage.getRemoveButtonCount();
-        System.out.println("Remove button count after second click: " + newCount);
-        Assert.assertTrue(newCount >= count, "Remove button count should increase or remain same after second click");
+        loginPage.loginAndVerify(username, password);
+        checkOutPage.addBackpackToCart();
+        Assert.assertTrue(checkOutPage.isBackpackRemoveVisible(), "Backpack Remove button should be visible");
+        Assert.assertEquals(checkOutPage.getCartBadgeCount(), 1, "Cart badge should be 1 after adding backpack");
+        checkOutPage.addBikeLightToCart();
+        Assert.assertTrue(checkOutPage.isBikeLightRemoveVisible(), "Bike Light Remove button should be visible");
+        Assert.assertEquals(checkOutPage.getCartBadgeCount(), 2, "Cart badge should be 2 after adding backpack and bike light");
     }
 }

@@ -1,25 +1,30 @@
 package pages;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import java.util.List;
-import static utils.DriverSetup.getDriver;
 
 public class CheckOut extends BasePage {
+
     private final By addToCartBackpack = By.cssSelector("[data-test='add-to-cart-sauce-labs-backpack']");
+    private final By addToCartBikeLight = By.cssSelector("[data-test='add-to-cart-sauce-labs-bike-light']");
     private final By removeBackpack = By.cssSelector("[data-test='remove-sauce-labs-backpack']");
-    public void clickAddToCart() {
+    private final By removeBikeLight = By.cssSelector("[data-test='remove-sauce-labs-bike-light']");
+    private final By cartBadge = By.cssSelector("[data-test='shopping-cart-badge']");
+    public void addBackpackToCart() {
         clickOn(addToCartBackpack);
     }
-    public void clickRemove() {
-        clickOn(removeBackpack);
+    public void addBikeLightToCart() {
+        clickOn(addToCartBikeLight);
     }
-    public boolean isRemoveVisible() {
-        List<WebElement> elements = getDriver().findElements(removeBackpack);
-        return !elements.isEmpty() && elements.get(0).isDisplayed();
+    public boolean isBackpackRemoveVisible() {
+        WebElement element = getElement(removeBackpack);
+        return element.isDisplayed();
     }
-    public int getRemoveButtonCount() {
-        List<WebElement> elements = getDriver().findElements(removeBackpack);
-        return elements.size();
+    public boolean isBikeLightRemoveVisible() {
+        WebElement element = getElement(removeBikeLight);
+        return element.isDisplayed();
+    }
+    public int getCartBadgeCount() {
+        WebElement badge = getElement(cartBadge);
+        return Integer.parseInt(badge.getText());
     }
 }

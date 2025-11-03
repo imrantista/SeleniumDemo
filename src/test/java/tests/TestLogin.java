@@ -18,13 +18,7 @@ public class TestLogin extends DriverSetup {
 
     @Test
     public void testWithValidCredential() {
-        loginPage.loginWithCredentials(username, password);
-        loginPage.verifySuccessError(
-                By.className("title"),
-                "Products",
-                "Login failed!",
-                "Login successful for user: " + username
-        );
+        loginPage.loginAndVerify(username, password);
     }
 
     @Test
@@ -40,13 +34,7 @@ public class TestLogin extends DriverSetup {
 
     @Test
     public void testLogoutAfterLogin() {
-        loginPage.loginWithCredentials(username, password);
-        loginPage.verifySuccessError(
-                By.className("title"),
-                "Products",
-                "Login failed!",
-                "Login successful for user: " + username
-        );
+        loginPage.loginAndVerify(username, password);
         logoutPage.clickOnMenu();
         logoutPage.clickOnLogout();
         Assert.assertEquals(loginPage.getLoginBtnValue(), "Login", "Logout failed");

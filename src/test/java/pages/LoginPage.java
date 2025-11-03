@@ -31,12 +31,19 @@ public class LoginPage extends BasePage {
     public String getLoginBtnValue(){
         return getAttributeValue(loginBtn, "value");
     }
-
-    // Reusable login method
     public void loginWithCredentials(String username, String password) {
         gotToLoginPage();
         addUsername(username);
         addPassword(password);
         clickOnLoginBtn();
+    }
+    public void loginAndVerify(String username, String password) {
+        loginWithCredentials(username, password);
+        verifySuccessError(
+                By.className("title"),
+                "Products",
+                "Login failed!",
+                "Login successful for user: " + username
+        );
     }
 }
