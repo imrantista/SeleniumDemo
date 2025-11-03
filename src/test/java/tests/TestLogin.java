@@ -38,7 +38,6 @@ public class TestLogin extends DriverSetup {
         logoutPage.clickOnMenu();
         logoutPage.clickOnLogout();
         Assert.assertEquals(loginPage.getLoginBtnValue(), "Login", "Logout failed");
-        System.out.println("Logout successfully");
+        System.out.println("Logout successful for user: " + username);
     }
-
 }
