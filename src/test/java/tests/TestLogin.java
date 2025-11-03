@@ -35,7 +35,7 @@ public class TestLogin extends DriverSetup {
         loginPage.clickOnLoginBtn();
         WebElement errorMessage = getDriver().findElement(By.cssSelector("h3[data-test='error']"));
         String actualError = errorMessage.getText();
-        String expectedError = "Epic sadface: Username and password do not match any user in this service";
+        String expectedError = "Username and password do not match any user in this service";
         Assert.assertEquals(actualError, expectedError, "Error message mismatch!");
         System.out.println("Login failed as expected with invalid credentials for");
     }
