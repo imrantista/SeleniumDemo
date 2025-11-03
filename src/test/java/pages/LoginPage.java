@@ -3,25 +3,40 @@ package pages;
 import org.openqa.selenium.By;
 import io.github.cdimascio.dotenv.Dotenv;
 
-public class LoginPage extends BasePage{
-    private final Dotenv dotenv = Dotenv.load();
+public class LoginPage extends BasePage {
+
     private final By usernameField = By.id("user-name");
     private final By passwordField = By.id("password");
     private final By loginBtn = By.id("login-button");
 
+    // Go to login page
     public void gotToLoginPage(){
         Dotenv dotenv = Dotenv.load();
         String baseUrl = dotenv.get("BASEURL");
         loadPage(baseUrl);
     }
+
     public void addUsername(String username){
-            writeOn(usernameField, username);
+        writeOn(usernameField, username);
     }
+
     public void addPassword(String password){
         writeOn(passwordField, password);
     }
 
     public void clickOnLoginBtn(){
         clickOn(loginBtn);
+    }
+
+    public String getLoginBtnValue(){
+        return getAttributeValue(loginBtn, "value");
+    }
+
+    // Reusable login method
+    public void loginWithCredentials(String username, String password) {
+        gotToLoginPage();
+        addUsername(username);
+        addPassword(password);
+        clickOnLoginBtn();
     }
 }
