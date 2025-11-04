@@ -15,7 +15,8 @@ import java.util.Comparator;
 import java.time.Duration;
 
 public class DriverSetup {
-    private static String browser_name = System.getProperty("browser", "Chrome");
+
+    private static String browser_name = System.getProperty("browser", "chrome");
     private static boolean headless = Boolean.parseBoolean(System.getProperty("headless", "false"));
 
     private static final ThreadLocal<WebDriver> LOCAL_DRIVER = new ThreadLocal<>();
@@ -54,28 +55,31 @@ public class DriverSetup {
 
     @AfterMethod(alwaysRun = true)
     public void closeBrowser() {
-        getDriver().quit();
+        if (getDriver() != null) {
+            getDriver().quit();
+        }
     }
 
     public WebDriver getBrowser(String browser_name) {
-        if (browser_name.equalsIgnoreCase("chrome")) {
-            WebDriverManager.chromedriver().setup();
-            ChromeOptions options = new ChromeOptions();
-            if (headless) {
-                options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
-            }
-            return new ChromeDriver(options);
+        switch (browser_name.toLowerCase()) {
+            case "chrome":
+                WebDriverManager.chromedriver().setup();
+                ChromeOptions options = new ChromeOptions();
+                if (headless) {
+                    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
+                }
+                return new ChromeDriver(options);
 
-        } else if (browser_name.equalsIgnoreCase("edge")) {
-            WebDriverManager.edgedriver().setup();
-            return new EdgeDriver();
+            case "edge":
+                WebDriverManager.edgedriver().setup();
+                return new EdgeDriver();
 
-        } else if (browser_name.equalsIgnoreCase("firefox")) {
-            WebDriverManager.firefoxdriver().setup();
-            return new FirefoxDriver();
+            case "firefox":
+                WebDriverManager.firefoxdriver().setup();
+                return new FirefoxDriver();
 
-        } else {
-            throw new RuntimeException("❌ Browser not supported: " + browser_name);
+            default:
+                throw new RuntimeException("❌ Browser not supported: " + browser_name);
         }
     }
 }

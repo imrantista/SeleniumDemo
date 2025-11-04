@@ -1,31 +1,29 @@
-name: Run Selenium Tests
+name: Run Selenium Tests with Maven
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [ "main" ]
   pull_request:
+    branches: [ "main" ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up Java 17
-      - name: Set up Java
-      # v4 is latest as of 2025, uses temurin JDK
+      # Step 2: Set up JDK 17 with Maven cache
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
 
-      # Step 3: Install Chrome (latest stable)
+      # Step 3: Install Google Chrome (latest stable)
       - name: Install Google Chrome
         run: |
           sudo apt-get update
@@ -36,23 +34,21 @@ jobs:
           sudo apt-get install -y google-chrome-stable
           google-chrome --version
 
-      # Step 4: Set up ChromeDriver (automatically matches Chrome)
-      - name: Setup ChromeDriver
-        uses: nanasess/setup-chromedriver@v2
-        with:
-          chromedriver-version: 'latest'
-
-      # Step 5: Create .env file from secrets (make sure these are added in GitHub repo settings)
+      # Step 4: Create .env file dynamically (if your tests use environment variables)
       - name: Create .env file
         run: |
           echo "BASEURL=${{ secrets.BASEURL }}" >> .env
-          echo "USER_NAME=${{ secrets.USER_NAME }}" >> .env
+          echo "USERNAME=${{ secrets.USERNAME }}" >> .env
           echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
 
-      # Step 6: Run Maven tests with headless Chrome
-      - name: Run Selenium tests (headless mode)
-        env:
-          DISPLAY: :99
-        run: |
-          export CHROME_BIN=/usr/bin/google-chrome
-          mvn clean test -Dbrowser=chrome -Dheadless=true
+      # Step 5: Run Selenium tests with Maven
+      - name: Run Selenium Tests
+        run: mvn clean test -Dbrowser=chrome -Dheadless=true
+
+      # (Optional) Step 6: Upload Allure results as artifact
+      - name: Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
