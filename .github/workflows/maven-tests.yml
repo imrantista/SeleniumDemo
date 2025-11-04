@@ -1,13 +1,10 @@
-name: Run Selenium Tests with Maven
+name: CI/CD
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,40 +12,46 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up JDK 17 with Maven cache
+      # Step 2: Set up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'maven'
+          cache: maven
 
-      # Step 3: Install Google Chrome (latest stable)
-      - name: Install Google Chrome
+      # Step 3: Install Google Chrome
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: 'latest'
+
+      - name: Verify Chrome installation
         run: |
-          sudo apt-get update
-          sudo apt-get install -y wget gnupg2
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
           google-chrome --version
+          which google-chrome
 
-      # Step 4: Create .env file dynamically (if your tests use environment variables)
+      # Step 4: Create .env file dynamically from GitHub secrets
       - name: Create .env file
         run: |
           echo "BASEURL=${{ secrets.BASEURL }}" >> .env
-          echo "USERNAME=${{ secrets.USERNAME }}" >> .env
+          echo "USER_NAME=${{ secrets.USERNAME }}" >> .env
           echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
 
-      # Step 5: Run Selenium tests with Maven
-      - name: Run Selenium Tests
-        run: mvn clean test -Dbrowser=chrome -Dheadless=true
+      # Step 5: Build project without running tests
+      - name: Build project
+        run: mvn -B -DskipTests clean package
 
-      # (Optional) Step 6: Upload Allure results as artifact
-      - name: Upload Allure Results
+      # Step 6: Run Selenium tests
+      - name: Run Tests
+        run: mvn test -Dheadless=true
+        env:
+          GITHUB_ACTIONS: "true"
+
+      # Step 7: Upload test results
+      - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-results
-          path: allure-results
+          name: test-results
+          path: target/surefire-reports
