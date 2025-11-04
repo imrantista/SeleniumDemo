@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Selenium Regression Test Suite">
+
+    <!-- ✅ Regression Test Suite -->
+    <test name="Tests">
+        <classes>
+            <!-- Include your regression test classes -->
+            <class name="tests.TestLogin"/>
+            <class name="tests.TestCheckOut"/>
+        </classes>
+    </test>
+
+</suite>
