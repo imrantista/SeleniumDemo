@@ -12,30 +12,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repo
+      # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up Java
+      # Step 2: Set up Java 17
       - name: Set up Java
+      # v4 is latest as of 2025, uses temurin JDK
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'maven'
 
-      # Step 3: Set up Chrome
-      - name: Install Chrome
+      # Step 3: Install Chrome (latest stable)
+      - name: Install Google Chrome
         run: |
           sudo apt-get update
+          sudo apt-get install -y wget gnupg2
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
           sudo apt-get install -y google-chrome-stable
+          google-chrome --version
 
-      # Step 4: Create .env file dynamically from GitHub secrets
+      # Step 4: Set up ChromeDriver (automatically matches Chrome)
+      - name: Setup ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+        with:
+          chromedriver-version: 'latest'
+
+      # Step 5: Create .env file from secrets (make sure these are added in GitHub repo settings)
       - name: Create .env file
         run: |
           echo "BASEURL=${{ secrets.BASEURL }}" >> .env
-          echo "USERNAME=${{ secrets.USERNAME }}" >> .env
+          echo "USER_NAME=${{ secrets.USER_NAME }}" >> .env
           echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
 
-      # Step 5: Run tests
-      - name: Run Maven tests
-        run: mvn clean test
+      # Step 6: Run Maven tests with headless Chrome
+      - name: Run Selenium tests (headless mode)
+        env:
+          DISPLAY: :99
+        run: |
+          export CHROME_BIN=/usr/bin/google-chrome
+          mvn clean test -Dbrowser=chrome -Dheadless=true
