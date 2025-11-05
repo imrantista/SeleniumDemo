@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 import pages.CheckOut;
 import pages.LoginPage;
 import utils.DriverSetup;
-import org.testng.asserts.SoftAssert;
+import utils.TestDataReader;
 
 public class TestCheckOut extends DriverSetup {
 
@@ -17,35 +17,35 @@ public class TestCheckOut extends DriverSetup {
     String password = dotenv.get("PASSWORD");
 
     @Test
-    public void testProductCheckOut() {
+    public void testDynamicProductCheckout() {
+        String[] products = TestDataReader.getProducts();
+        String firstProduct = products[0];
+        String secondProduct = products[1];
         loginPage.loginAndVerify(username, password);
         loginPage.handleOptionalBrowserAlert("Change your password", 6);
-        checkOutPage.addBackpackToCart();
-        Assert.assertTrue(checkOutPage.isBackpackRemoveVisible(), "Backpack Remove button should be visible");
-        Assert.assertEquals(checkOutPage.getCartBadgeCount(), 1, "Cart badge should be 1 after adding backpack");
-        checkOutPage.addBikeLightToCart();
-        Assert.assertTrue(checkOutPage.isBikeLightRemoveVisible(), "Bike Light Remove button should be visible");
-        Assert.assertEquals(checkOutPage.getCartBadgeCount(), 2, "Cart badge should be 2 after adding two items");
+        checkOutPage.addProductToCart(firstProduct);
+        double firstPrice = checkOutPage.getProductPrice(firstProduct);
+        Assert.assertTrue(checkOutPage.isProductRemoveVisible(firstProduct));
+        Assert.assertEquals(checkOutPage.getCartBadgeCount(), 1);
+        checkOutPage.addProductToCart(secondProduct);
+        double secondPrice = checkOutPage.getProductPrice(secondProduct);
+        Assert.assertTrue(checkOutPage.isProductRemoveVisible(secondProduct));
+        Assert.assertEquals(checkOutPage.getCartBadgeCount(), 2);
         checkOutPage.openCart();
         checkOutPage.clickCheckout();
-        checkOutPage.fillCheckoutForm("Imran", "Hossain", "6000");
+        checkOutPage.fillCheckoutForm(
+                TestDataReader.getFirstName(),
+                TestDataReader.getLastName(),
+                TestDataReader.getPostalCode()
+        );
         checkOutPage.continueCheckout();
         double pageSubtotal = checkOutPage.getSubtotalFromPage();
-        System.out.println("Subtotal on Page: $" + pageSubtotal);
+        double expectedSubtotal = firstPrice + secondPrice;
+        System.out.println("Expected Subtotal: $" + expectedSubtotal);
+        System.out.println("Page Subtotal: $" + pageSubtotal);
+        Assert.assertEquals(pageSubtotal, expectedSubtotal, 0.01, "Subtotal should match expected total");
         checkOutPage.finishCheckout();
-        Assert.assertTrue(checkOutPage.isCheckoutComplete(), "Checkout should complete successfully");
-        System.out.println("Checkout completed successfully for user: " + username);
+        Assert.assertTrue(checkOutPage.isCheckoutComplete());
         checkOutPage.goBackToProducts();
-        System.out.println("Returned to Products page.");
-    }
-    @Test
-    public void testTotalPrice() {
-        loginPage.loginAndVerify(username, password);
-
-        double totalPrice = checkOutPage.getTotalBackpackAndBikeLightPrice();
-        System.out.println("Total Price of Backpack + Bike Light: $" + totalPrice);
-
-        Assert.assertTrue(totalPrice > 0, "Total price should be greater than 0");
     }
 }
-
