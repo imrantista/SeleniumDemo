@@ -6,6 +6,7 @@ import org.testng.annotations.Test;
 import pages.CheckOut;
 import pages.LoginPage;
 import utils.DriverSetup;
+import org.testng.asserts.SoftAssert;
 
 public class TestCheckOut extends DriverSetup {
 
@@ -29,10 +30,22 @@ public class TestCheckOut extends DriverSetup {
         checkOutPage.clickCheckout();
         checkOutPage.fillCheckoutForm("Imran", "Hossain", "6000");
         checkOutPage.continueCheckout();
+        double pageSubtotal = checkOutPage.getSubtotalFromPage();
+        System.out.println("Subtotal on Page: $" + pageSubtotal);
         checkOutPage.finishCheckout();
         Assert.assertTrue(checkOutPage.isCheckoutComplete(), "Checkout should complete successfully");
         System.out.println("Checkout completed successfully for user: " + username);
         checkOutPage.goBackToProducts();
         System.out.println("Returned to Products page.");
     }
+    @Test
+    public void testTotalPrice() {
+        loginPage.loginAndVerify(username, password);
+
+        double totalPrice = checkOutPage.getTotalBackpackAndBikeLightPrice();
+        System.out.println("Total Price of Backpack + Bike Light: $" + totalPrice);
+
+        Assert.assertTrue(totalPrice > 0, "Total price should be greater than 0");
+    }
 }
+
