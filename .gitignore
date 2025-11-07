@@ -38,3 +38,23 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Allure Report ###
+allure-results
+allure-report
+allure-report.zip
+allure-report.html
+allure-report.pdf
+allure-report.json
+
+### Allure related files container.json ###
+allure-results/*.container.json
+allure-results/*.result.json
+allure-results/*.history.json
+allure-results/*.attachment.json
+allure-results/*.meta.json
+allure-results/*.properties.json
+allure-results/*.properties.json
+allure-results/*.properties.json
+
+
