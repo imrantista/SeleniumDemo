@@ -22,7 +22,16 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      # Step 3: Install Google Chrome
+      # Step 3: Cache Maven dependencies
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Step 4: Install Google Chrome
       - name: Set up Chrome
         uses: browser-actions/setup-chrome@v1
         with:
@@ -33,24 +42,24 @@ jobs:
           google-chrome --version
           which google-chrome
 
-      # Step 4: Create .env file dynamically from GitHub secrets
+      # Step 5: Create .env file dynamically from GitHub secrets
       - name: Create .env file
         run: |
           echo "BASEURL=${{ secrets.BASEURL }}" > .env
           echo "USER_NAME=${{ secrets.USERNAME }}" >> .env
           echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
 
-      # Step 5: Build project without running tests
+      # Step 6: Build project without running tests
       - name: Build project
         run: mvn -B -DskipTests clean package
 
-      # Step 6: Run Selenium tests
+      # Step 7: Run Selenium tests
       - name: Run Tests
         run: mvn test -Dheadless=true
         env:
           GITHUB_ACTIONS: "true"
 
-      # Step 7: Upload test results
+      # Step 8: Upload test results
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4
