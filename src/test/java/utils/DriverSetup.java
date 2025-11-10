@@ -86,8 +86,13 @@ public class DriverSetup {
                 options.setExperimentalOption("prefs", prefs);
                 options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
 
-//                if (headless) {
-//                    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
+                if (headless) {
+                    options.addArguments("--headless=new");
+                    options.addArguments("--no-sandbox");
+                    options.addArguments("--disable-dev-shm-usage");
+                    options.addArguments("--disable-gpu");
+                    options.addArguments("--window-size=1920,1080");
+                }
 
                 return new ChromeDriver(options);
 
