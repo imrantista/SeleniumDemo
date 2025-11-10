@@ -13,14 +13,17 @@ public class LoginPage extends BasePage {
     public void gotToLoginPage() {
         String baseUrl = dotenv.get("BASEURL");
         loadPage(baseUrl);
+        System.out.println("Url get successfully");
     }
 
     public void addUsername(String username) {
         typeText(usernameField, username);
+        System.out.println("Username type successfully");
     }
 
     public void addPassword(String password) {
         typeText(passwordField, password);
+        System.out.println("Password type successfully");
     }
 
     public void clickOnLoginBtn() {

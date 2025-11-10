@@ -54,7 +54,5 @@ allure-results/*.history.json
 allure-results/*.attachment.json
 allure-results/*.meta.json
 allure-results/*.properties.json
-allure-results/*.properties.json
-allure-results/*.properties.json
 
 

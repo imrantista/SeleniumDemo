@@ -7,6 +7,14 @@ import pages.CheckOut;
 import pages.LoginPage;
 import utils.DriverSetup;
 import utils.TestDataReader;
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Link;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Severity;
+import io.qameta.allure.TmsLink;
+
+import static io.qameta.allure.SeverityLevel.CRITICAL;
 
 public class TestCheckOut extends DriverSetup {
 
@@ -17,12 +25,17 @@ public class TestCheckOut extends DriverSetup {
     String password = dotenv.get("PASSWORD");
 
     @Test
+    @Description("This test attempts to checkout product")
+    @Severity(CRITICAL)
+    @Owner("GM Imran")
+    @Link(name = "Swag Labs", url = "https://www.saucedemo.com/")
+    @Issue("Product-123")
+    @TmsLink("TMS-456")
     public void testDynamicProductCheckout() {
         String[] products = TestDataReader.getProducts();
         String firstProduct = products[0];
         String secondProduct = products[1];
         loginPage.loginAndVerify(username, password);
-        loginPage.handleOptionalBrowserAlert("Change your password", 6);
         checkOutPage.addProductToCart(firstProduct);
         double firstPrice = checkOutPage.getProductPrice(firstProduct);
         Assert.assertTrue(checkOutPage.isProductRemoveVisible(firstProduct));

@@ -88,7 +88,7 @@ public class DriverSetup {
 
 //                if (headless) {
 //                    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
-//                }changed
+
                 return new ChromeDriver(options);
 
             case "edge":
