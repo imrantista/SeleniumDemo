@@ -36,7 +36,7 @@ jobs:
       # Step 4: Create .env file dynamically from GitHub secrets
       - name: Create .env file
         run: |
-          echo "BASEURL=${{ secrets.BASEURL }}" >> .env
+          echo "BASEURL=${{ secrets.BASEURL }}" > .env
           echo "USER_NAME=${{ secrets.USERNAME }}" >> .env
           echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
 
