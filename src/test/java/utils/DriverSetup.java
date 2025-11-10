@@ -1,20 +1,25 @@
 package utils;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.*;
-import java.util.Comparator;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
+import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class DriverSetup {
 
@@ -66,17 +71,10 @@ public class DriverSetup {
         switch (browser_name.toLowerCase()) {
             case "chrome":
                 WebDriverManager.chromedriver().setup();
-                //ChromeOptions options = new ChromeOptions();
-
-                // Configure Chrome options to disable password manager popup
                 ChromeOptions options = new ChromeOptions();
-
-                // Disable password manager arguments
                 options.addArguments("--disable-save-password-bubble");
                 options.addArguments("--disable-password-manager-reauthentication");
                 options.addArguments("--disable-blink-features=AutomationControlled");
-
-                // Comprehensive preferences to disable all password manager features
                 Map<String, Object> prefs = new HashMap<>();
                 prefs.put("credentials_enable_service", false);
                 prefs.put("profile.password_manager_enabled", false);
@@ -105,7 +103,7 @@ public class DriverSetup {
                 return new FirefoxDriver();
 
             default:
-                throw new RuntimeException("❌ Browser not supported: " + browser_name);
+                throw new RuntimeException("Browser not supported: " + browser_name);
         }
     }
 }

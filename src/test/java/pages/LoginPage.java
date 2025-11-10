@@ -41,6 +41,7 @@ public class LoginPage extends BasePage {
         loginWithCredentials(username, password);
         verifySuccessError(By.className("title"), "Products", "Login failed!", "Login successful for user: " + username);
     }
+
     public String getLoginBtnValue() {
         return getElement(loginBtn).getDomAttribute("value");
     }
