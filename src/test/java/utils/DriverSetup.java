@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.Comparator;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DriverSetup {
 
@@ -64,10 +66,29 @@ public class DriverSetup {
         switch (browser_name.toLowerCase()) {
             case "chrome":
                 WebDriverManager.chromedriver().setup();
+                //ChromeOptions options = new ChromeOptions();
+
+                // Configure Chrome options to disable password manager popup
                 ChromeOptions options = new ChromeOptions();
-                if (headless) {
-                    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
-                }
+
+                // Disable password manager arguments
+                options.addArguments("--disable-save-password-bubble");
+                options.addArguments("--disable-password-manager-reauthentication");
+                options.addArguments("--disable-blink-features=AutomationControlled");
+
+                // Comprehensive preferences to disable all password manager features
+                Map<String, Object> prefs = new HashMap<>();
+                prefs.put("credentials_enable_service", false);
+                prefs.put("profile.password_manager_enabled", false);
+                prefs.put("profile.password_manager_leak_detection", false);
+                prefs.put("autofill.profile_enabled", false);
+
+                options.setExperimentalOption("prefs", prefs);
+                options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+
+//                if (headless) {
+//                    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
+//                }
                 return new ChromeDriver(options);
 
             case "edge":

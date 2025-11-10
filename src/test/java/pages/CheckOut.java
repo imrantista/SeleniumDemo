@@ -3,6 +3,7 @@ package pages;
 import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+
 import static utils.DriverSetup.getDriver;
 
 public class CheckOut extends BasePage {
@@ -38,6 +39,7 @@ public class CheckOut extends BasePage {
         return isElementVisible(getRemoveButton(productName));
     }
 
+    @Step("Get cart badge count")
     public int getCartBadgeCount() {
         return Integer.parseInt(getText(cartBadge));
     }
@@ -69,6 +71,7 @@ public class CheckOut extends BasePage {
         clickOn(finishButton);
     }
 
+    @Step("Verify checkout completion")
     public boolean isCheckoutComplete() {
         return isElementVisible(completeHeader);
     }
@@ -84,14 +87,12 @@ public class CheckOut extends BasePage {
                 By.xpath("//div[@data-test='inventory-item-name' and text()='" + productName +
                         "']/ancestor::div[@class='inventory_item']//div[@data-test='inventory-item-price']")
         );
-        String priceText = priceElement.getText().replace("$", "");
-        return Double.parseDouble(priceText);
+        return Double.parseDouble(priceElement.getText().replace("$", ""));
     }
 
     @Step("Get subtotal from checkout page")
     public double getSubtotalFromPage() {
         WebElement subtotalElement = getDriver().findElement(subtotalLabel);
-        String subtotalText = subtotalElement.getText().replace("Item total: $", "");
-        return Double.parseDouble(subtotalText);
+        return Double.parseDouble(subtotalElement.getText().replace("Item total: $", ""));
     }
 }
