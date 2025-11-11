@@ -1,14 +1,19 @@
 package tests;
 
-import io.github.cdimascio.dotenv.Dotenv;
-import io.qameta.allure.*;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import io.github.cdimascio.dotenv.Dotenv;
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Link;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Severity;
+import static io.qameta.allure.SeverityLevel.CRITICAL;
+import io.qameta.allure.TmsLink;
 import pages.LoginPage;
 import pages.Logout;
 import utils.DriverSetup;
-
-import static io.qameta.allure.SeverityLevel.CRITICAL;
 
 public class TestLogin extends DriverSetup {
 
@@ -19,29 +24,32 @@ public class TestLogin extends DriverSetup {
     String password = dotenv.get("PASSWORD");
 
     @Test
-    @Description("This test attempts to valid data")
+    @Description("Login with valid credentials should succeed")
     @Severity(CRITICAL)
     @Owner("GM Imran")
     @Link(name = "Swag Labs", url = "https://www.saucedemo.com/")
     @Issue("Auth-123")
     @TmsLink("TMS-456")
-    public void testWithValidCredential() {
+    public void doLoginWithValidCredentials() {
         loginPage.loginAndVerify(username, password);
     }
 
     @Test
-    @Description("This test attempts to invalid data")
+    @Description("Login with invalid credentials should fail")
     @Severity(CRITICAL)
     @Owner("GM Imran")
     @Link(name = "Swag Labs", url = "https://www.saucedemo.com/")
     @Issue("Auth-123")
     @TmsLink("TMS-456")
-    public void testWithInvalidCredential() {
+    public void doLoginWithInvalidCredentials() {
         loginPage.InvalidLoginAndVerify(username, "12345");
     }
 
     @Test
-    public void testLogoutAfterLogin() {
+    @Description("Logout should succeed after successful login")
+    @Severity(CRITICAL)
+    @Owner("GM Imran")
+    public void doLogoutAfterLogin() {
         loginPage.loginAndVerify(username, password);
         logoutPage.clickOnMenu();
         logoutPage.clickOnLogout();
