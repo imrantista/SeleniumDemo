@@ -1,7 +1,13 @@
 name: CI/CD
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -20,7 +26,16 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      # Step 3: Install Google Chrome
+      # Step 3: Cache Maven dependencies
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Step 4: Install Google Chrome
       - name: Set up Chrome
         uses: browser-actions/setup-chrome@v1
         with:
@@ -31,27 +46,81 @@ jobs:
           google-chrome --version
           which google-chrome
 
-      # Step 4: Create .env file dynamically from GitHub secrets
+      # Step 5: Create .env file dynamically from GitHub secrets
       - name: Create .env file
         run: |
-          echo "BASEURL=${{ secrets.BASEURL }}" >> .env
+          echo "BASEURL=${{ secrets.BASEURL }}" > .env
           echo "USER_NAME=${{ secrets.USERNAME }}" >> .env
           echo "PASSWORD=${{ secrets.PASSWORD }}" >> .env
 
-      # Step 5: Build project without running tests
+      # Step 6: Build project without running tests
       - name: Build project
         run: mvn -B -DskipTests clean package
 
-      # Step 6: Run Selenium tests
+      # Step 7: Run Selenium tests
       - name: Run Tests
         run: mvn test -Dheadless=true
         env:
           GITHUB_ACTIONS: "true"
 
-      # Step 7: Upload test results
-      - name: Upload Test Results
+      # Step 8: Generate Allure Report
+      - name: Generate Allure Report
+        run: |
+          mvn allure:report
+          ls -R target/site/allure-maven-plugin || echo "Allure report not found"
+
+      # Step 9: Upload Allure Report as artifact
+      - name: Upload Allure Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: target/surefire-reports
+          name: allure-report
+          path: target/site/allure-maven-plugin
+
+  deploy-allure-report:
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Allure report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report
+
+      # Deploy report to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-report
+          destination_dir: allure-report
+
+      # Send email with hosted report link
+      - name: Send Allure Report via Email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Allure Test Report - ${{ github.repository }} [${{ github.run_number }}]"
+          to: imran.cse04@gmail.com
+          from: "GitHub CI <${{ secrets.EMAIL_USERNAME }}>"
+          body: |
+            Hello,
+
+            The latest Allure test report is available here:
+            https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/allure-report/
+
+            Repository: ${{ github.repository }}
+            Workflow: ${{ github.workflow }}
+            Run Number: ${{ github.run_number }}
+            Commit: ${{ github.sha }}
+
+            Regards,
+            GitHub CI/CD

@@ -2,7 +2,6 @@ package tests;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import io.qameta.allure.*;
-import org.openqa.selenium.By;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pages.LoginPage;
@@ -38,13 +37,7 @@ public class TestLogin extends DriverSetup {
     @Issue("Auth-123")
     @TmsLink("TMS-456")
     public void testWithInvalidCredential() {
-        loginPage.loginWithCredentials(username, "12345");
-        loginPage.verifySuccessError(
-                By.cssSelector("h3[data-test='error']"),
-                "Epic sadface: Username and password do not match any user in this service",
-                "Error message mismatch!",
-                "Login failed as expected with invalid credentials for " + username
-        );
+        loginPage.InvalidLoginAndVerify(username, "12345");
     }
 
     @Test
