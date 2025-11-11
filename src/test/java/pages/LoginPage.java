@@ -44,4 +44,13 @@ public class LoginPage extends BasePage {
     public String getLoginBtnValue() {
         return getElement(loginBtn).getDomAttribute("value");
     }
+
+    public void InvalidLoginAndVerify(String username, String password) {
+        loginWithCredentials(username, password);
+        verifySuccessError(By.cssSelector("h3[data-test='error']"),
+                "Epic sadface: Username and password do not match any user in this service",
+                "Error message mismatch!",
+                "Login failed as expected with invalid credentials for " + username);
+    }
+
 }
